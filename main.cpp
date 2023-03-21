@@ -107,7 +107,7 @@ void pokazKlienci(Klient*& KlientTab, int& iloscKlientow) {
     for (int i = 0; i < iloscKlientow; i++)
     {
         cout << endl <<
-            KlientTab[i].id << ". Godnosc: " << KlientTab[i].imie << " " << KlientTab[i].nazwisko << "\nWiek: " << KlientTab[i].wiek << "\n";
+            KlientTab[i].id << ". Godnosc: " << KlientTab[i].imie << " " << KlientTab[i].nazwisko << "\nWiek: " << KlientTab[i].wiek << endl;
     }
 }
 
@@ -115,7 +115,7 @@ void pokazSamochody(Samochod**& SamochodTab, int& iloscSamochodow) {
     for (int i = 0; i < iloscSamochodow; i++)
     {
         cout << endl <<
-            SamochodTab[i]->id << ". Samochod: " << SamochodTab[i]->marka << " " << SamochodTab[i]->model << "\nMoc: " << SamochodTab[i]->moc << " KM" << "\n";
+            SamochodTab[i]->id << ". Samochod: " << SamochodTab[i]->marka << " " << SamochodTab[i]->model << "\nMoc: " << SamochodTab[i]->moc << " KM" << endl;
     }
 }
 
