@@ -4,18 +4,31 @@
 #include <string>
 using namespace std;
 
-struct Klient {
-    int id;
-    string imie;
-    string nazwisko;
-    int wiek;
+struct Silnik {
+    int pojemnosc;
+    int moc;
 };
 
 struct Samochod {
     int id;
     string marka;
     string model;
-    int moc;
+    Silnik silnik;   // agregacja silnika w samochodzie
 };
+
+struct Klient {
+    int id;
+    string imie;
+    string nazwisko;
+    int wiek;
+
+};
+
+struct Wypozyczalnia {
+    Samochod** samochody;
+    Klient* klienci;
+};
+
+
 
 #endif 
