@@ -50,20 +50,23 @@ void dodajSamochod(Samochod**& SamochodTab, int& iloscSamochodow, int maxIloscSa
         }
         cin.ignore();
         string daneSamochodu;
-        cout << "Podaj marke, model, rok produkcji i przebieg samochodu oddzielajac je srednikiem (;): ";
+        cout << "Podaj marke, model, pojemnosc i moc silnika oddzielajac je srednikiem (;): " << endl;
+        cout << "Dane: ";
         getline(cin, daneSamochodu);
         size_t pos = daneSamochodu.find(";");
         SamochodTabTemp[iloscSamochodow] = new Samochod();
-        SamochodTabTemp[iloscSamochodow]->id = iloscSamochodow+1;
+        SamochodTabTemp[iloscSamochodow]->id = iloscSamochodow + 1;
         SamochodTabTemp[iloscSamochodow]->marka = daneSamochodu.substr(0, pos);
         size_t prev_pos = pos + 1;
         pos = daneSamochodu.find(";", prev_pos);
         SamochodTabTemp[iloscSamochodow]->model = daneSamochodu.substr(prev_pos, pos - prev_pos);
         prev_pos = pos + 1;
-       // pos = daneSamochodu.find(";", prev_pos);
-       // SamochodTabTemp[iloscSamochodow]->rok = stoi(daneSamochodu.substr(prev_pos, pos - prev_pos));
-        //prev_pos = pos + 1;
-        SamochodTabTemp[iloscSamochodow]->moc = stoi(daneSamochodu.substr(prev_pos));
+        pos = daneSamochodu.find(";", prev_pos);
+        SamochodTabTemp[iloscSamochodow]->silnik.pojemnosc = stoi(daneSamochodu.substr(prev_pos, pos - prev_pos));
+        prev_pos = pos + 1;
+        pos = daneSamochodu.find(";", prev_pos);
+        SamochodTabTemp[iloscSamochodow]->silnik.moc = stoi(daneSamochodu.substr(prev_pos, pos - prev_pos));
+        prev_pos = pos + 1;
         SamochodTab = SamochodTabTemp;
         iloscSamochodow++;
     }
@@ -85,7 +88,7 @@ void pokazSamochody(Samochod**& SamochodTab, int& iloscSamochodow) {
     for (int i = 0; i < iloscSamochodow; i++)
     {
         cout << endl <<
-            SamochodTab[i]->id << ". Samochod: " << SamochodTab[i]->marka << " " << SamochodTab[i]->model << "\nMoc: " << SamochodTab[i]->moc << " KM" << endl;
+            SamochodTab[i]->id << ". Samochod: " << SamochodTab[i]->marka << " " << SamochodTab[i]->model << "\nMoc: " << SamochodTab[i]->silnik.moc << " KM" << "\nPojemnosc silnika: " << SamochodTab[i]->silnik.pojemnosc << " cm^3" << endl;
     }
 }
 
@@ -162,53 +165,55 @@ bool wyczyscPamiec(Klient*& KlientTab, Samochod**& SamochodTab, int iloscKliento
     return false;
 }
 
-void wiekKlienci(Klient* KlientTab, int iloscKlientow) {
-    for (int i = 0; i < iloscKlientow; i++) {
-        KlientTab[i].wiek += 5;
-    }
-    cout << "Zwiekszono wiek wszystkich klientow o 5" << endl;
+
+
+bool porownajMoc(Samochod* a, Samochod* b) {
+    return a->silnik.moc > b->silnik.moc;
 }
 
-void mocSamochody(Samochod** SamochodyTab, int iloscSamochodow) {
-    for (int i = 0; i < iloscSamochodow; i++) {
-        SamochodyTab[i]->moc += 100;
-    }
-    cout << "Zwiekszono moc wszystkich samochodow o 100 koni mechanicznych." << endl;
+void posortujSamochody(Samochod** SamochodTab, int iloscSamochodow) {
+    sort(SamochodTab, SamochodTab + iloscSamochodow, porownajMoc);
 }
 
-void wprowadzDaneKlienta(Klient* KlientTab) {
-    string input;
-    cout << "Podaj id, imię, nazwisko i wiek klienta, oddzielając każdy atrybut średnikiem: ";
-    getline(cin, input);
+void wyswietlPosortowaneSamochody(Samochod** SamochodTab, int iloscSamochodow) {
+    cout << "Posortowane samochody (od największej mocy): " << endl;
+    if (iloscSamochodow != 0) {
+        for (int i = 0; i < iloscSamochodow; i++) {
+            cout << SamochodTab[i]->id << ". " << SamochodTab[i]->marka << " " << SamochodTab[i]->model << ", moc: " << SamochodTab[i]->silnik.moc << " KM\n";
+        }
+    }
+    else {
+        cout << "Brak Samochodow do posortowania" << endl;
+    }
+}
 
-    stringstream ss(input);
-    string token;
-
-    getline(ss, token, ';');
-    KlientTab->id = stoi(token);
-
-    getline(ss, KlientTab->imie, ';');
-
-    getline(ss, KlientTab->nazwisko, ';');
-
-    getline(ss, token, ';');
-    KlientTab->wiek = stoi(token);
+void sortujKlientowRosnaco(Wypozyczalnia wypozyczalnia, int liczbaKlientow) {
+    for (int i = 0; i < liczbaKlientow - 1; i++) {
+        for (int j = 0; j < liczbaKlientow - i - 1; j++) {
+            if (wypozyczalnia.klienci[j].wiek > wypozyczalnia.klienci[j + 1].wiek) {
+                Klient temp = wypozyczalnia.klienci[j];
+                wypozyczalnia.klienci[j] = wypozyczalnia.klienci[j + 1];
+                wypozyczalnia.klienci[j + 1] = temp;
+            }
+        }
+    }
 }
 
 
 
 int main()
 {
-    default_random_engine e;
-    uniform_int_distribution<unsigned> u(3, 10);
-    int maxIloscKlientow = u(e);
-    int maxIloscSamochodow = u(e);
-
-    bool dzialanie = true;
     int iloscKlientow = 0;
     int iloscSamochodow = 0;
-    Klient* KlientTab = new Klient[maxIloscKlientow];
-    Samochod** SamochodTab = new Samochod * [maxIloscSamochodow];
+    random_device rd;
+    mt19937 e(rd());
+    uniform_int_distribution<int> dr(5, 15);
+    int maxIloscKlientow = dr(e);
+    int maxIloscSamochodow = dr(e);
+    bool dzialanie = true;
+    Wypozyczalnia wypozyczalnia;
+    wypozyczalnia.samochody = new Samochod * [maxIloscSamochodow];
+    wypozyczalnia.klienci = new Klient[maxIloscKlientow];
 
     while (dzialanie) {
         cout << "" << endl;
@@ -219,8 +224,8 @@ int main()
         cout << "4.Pokaz samochody " << endl;
         cout << "5.Usun Klienta " << endl;
         cout << "6.Usun Samochod " << endl;
-        cout << "7.Zwieksz wiek wszystkich klientow o 5" << endl;
-        cout << "8.Zwieksz moc wszystkich samochodow o 100KM" << endl;
+        cout << "7.Posortuj klientow wedlug wieku" << endl;
+        cout << "8.Posortuj samochody wzgledem mocy" << endl;
         cout << "0.Wyjscie i wyczyszczenie pamieci" << endl;
         cout << "" << endl;
         cout << "Klienci: " << iloscKlientow << "/" << maxIloscKlientow << "" << "  Ilosc samochodow: " << iloscSamochodow << "/" << maxIloscSamochodow << endl;
@@ -232,37 +237,39 @@ int main()
         switch (wybor) {
         case 1:
             
-            dodajKlienta(KlientTab, iloscKlientow, maxIloscKlientow);
+            dodajKlienta(wypozyczalnia.klienci, iloscKlientow, maxIloscKlientow);
             cout << "Dodano Klienta" << endl;
             break;
         case 2:
-            dodajSamochod(SamochodTab, iloscSamochodow, maxIloscSamochodow);
+            dodajSamochod(wypozyczalnia.samochody, iloscSamochodow, maxIloscSamochodow);
             cout << "Dodano samochod" << endl;
             break;
         case 3:
             cout << "Lista klientow: " << endl;
-            pokazKlienci(KlientTab, iloscKlientow);
+            pokazKlienci(wypozyczalnia.klienci, iloscKlientow);
             break;
         case 4:
             cout << "Lista samochodow: " << endl;
-            pokazSamochody(SamochodTab, iloscSamochodow);
+            pokazSamochody(wypozyczalnia.samochody, iloscSamochodow);
             break;
         case 5:
-            usunKlienta(KlientTab, iloscKlientow);
+            usunKlienta(wypozyczalnia.klienci , iloscKlientow);
             cout << "Klient usuniety" << endl;
             break;
         case 6:
-            usunSamochod(SamochodTab, iloscSamochodow);
+            usunSamochod(wypozyczalnia.samochody , iloscSamochodow);
             cout << "Samochod usuniety" << endl;
             break;
         case 7:
-            wiekKlienci(KlientTab, iloscKlientow);
+            sortujKlientowRosnaco(wypozyczalnia, iloscKlientow);
+            pokazKlienci(wypozyczalnia.klienci, iloscKlientow);
             break;
         case 8:
-            mocSamochody(SamochodTab, iloscSamochodow);
+            posortujSamochody(wypozyczalnia.samochody, iloscSamochodow);
+            wyswietlPosortowaneSamochody(wypozyczalnia.samochody, iloscSamochodow);
             break;
         case 0:
-            dzialanie = wyczyscPamiec(KlientTab, SamochodTab, iloscKlientow, iloscSamochodow);
+            dzialanie = wyczyscPamiec(wypozyczalnia.klienci, wypozyczalnia.samochody, iloscKlientow, iloscSamochodow);
             break;
         default:
             break;
