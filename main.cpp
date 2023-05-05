@@ -67,17 +67,17 @@ void dodajSamochod(Samochod**& SamochodTab, int& iloscSamochodow, int maxIloscSa
         pos = daneSamochodu.find(";", prev_pos);
         int pojemnosc = stoi(daneSamochodu.substr(prev_pos, pos - prev_pos));
         prev_pos = pos + 1;
-        pos = daneSamochodu.find(";", prev_pos);
-        int moc = stoi(daneSamochodu.substr(prev_pos, pos - prev_pos));
-        prev_pos = pos + 1;
+        int moc = stoi(daneSamochodu.substr(prev_pos));
 
-        SamochodTabTemp[iloscSamochodow] = new Samochod(iloscSamochodow + 1, marka, model, Silnik(pojemnosc, moc));
+        Silnik* silnik = new Silnik(pojemnosc, moc);
+        Samochod* samochod = new Samochod(iloscSamochodow + 1, marka, model, silnik);
+        SamochodTabTemp[iloscSamochodow] = samochod;
 
         SamochodTab = SamochodTabTemp;
         iloscSamochodow++;
     }
     else {
-        cout << "Nie mozna dodac wiecej samochodow!" << endl;
+        cout << "Nie mozna dodac wiecej samochodow." << endl;
     }
 }
 
@@ -98,8 +98,9 @@ void pokazKlienci(Klient* klientTab, int iloscKlientow) {
 void pokazSamochody(Samochod** samochody, int iloscSamochodow) {
     if (iloscSamochodow != 0) {
         for (int i = 0; i < iloscSamochodow; i++) {
-            cout << endl <<
-                samochody[i]->getId() << ". Samochod: " << samochody[i]->getMarka() << " " << samochody[i]->getModel() << "\nMoc: " << samochody[i]->getSilnik().getMoc() << " KM" << "\nPojemnosc silnika: " << samochody[i]->getSilnik().getPojemnosc() << " cm^3" << endl;
+            cout << samochody[i]->getId() << ". Samochod: " << samochody[i]->getMarka() << " " << samochody[i]->getModel()
+                << "\nMoc: " << samochody[i]->getSilnik()->getMoc() << " KM"
+                << "\nPojemnosc silnika: " << samochody[i]->getSilnik()->getPojemnosc() << " cm^3" << endl << endl;
         }
     }
     else {
@@ -175,7 +176,7 @@ void usunSamochod(Samochod**& SamochodTab, int& iloscSamochodow) {
 }
 
 //usuniecie wszystkich obiektow i wyczyszczenie pamieci
-bool wyczyscPamiec(Klient*& KlientTab, Samochod**& SamochodTab, int iloscKlientow, int iloscSamochodow) {
+void zakonczProgram(Klient*& KlientTab, Samochod**& SamochodTab, int iloscKlientow, int iloscSamochodow) {
     delete[] KlientTab;
     KlientTab = nullptr;
     for (int i = 0; i < iloscSamochodow; i++) {
@@ -183,7 +184,7 @@ bool wyczyscPamiec(Klient*& KlientTab, Samochod**& SamochodTab, int iloscKliento
     }
     delete[] SamochodTab;
     SamochodTab = nullptr;
-    return false;
+    exit(0);
 }
 
 
@@ -191,7 +192,7 @@ bool wyczyscPamiec(Klient*& KlientTab, Samochod**& SamochodTab, int iloscKliento
 void sortujSamochodyWzgledemMocy(Samochod**& SamochodTab, int& iloscSamochodow) {
     for (int i = 0; i < iloscSamochodow - 1; i++) {
         for (int j = 0; j < iloscSamochodow - i - 1; j++) {
-            if (SamochodTab[j]->getSilnik().getMoc() > SamochodTab[j + 1]->getSilnik().getMoc()) {
+            if (SamochodTab[j]->getSilnik()->getMoc() > SamochodTab[j + 1]->getSilnik()->getMoc()) {
                 Samochod* temp = SamochodTab[j];
                 SamochodTab[j] = SamochodTab[j + 1];
                 SamochodTab[j + 1] = temp;
@@ -201,7 +202,7 @@ void sortujSamochodyWzgledemMocy(Samochod**& SamochodTab, int& iloscSamochodow) 
     // Wyświetlenie posortowanej tablicy
     pokazSamochody(SamochodTab, iloscSamochodow);
 }
-   
+
 
 void sortujKlientowRosnaco(Klient*& klientTab, int liczbaKlientow) {
     for (int i = 0; i < liczbaKlientow - 1; i++) {
@@ -215,6 +216,44 @@ void sortujKlientowRosnaco(Klient*& klientTab, int liczbaKlientow) {
     }
 }
 
+
+void przypiszSamochodDoKlienta(Klient* KlientTab, int iloscKlientow, Samochod** SamochodTab, int iloscSamochodow) {
+    int klientId, samochodId;
+    bool klientZnaleziony = false, samochodZnaleziony = false;
+    cout << "Podaj id klienta: ";
+    cin >> klientId;
+    cout << "Podaj id samochodu: ";
+    cin >> samochodId;
+    for (int i = 0; i < iloscKlientow; i++) {
+        if (KlientTab[i].getId() == klientId) {
+            klientZnaleziony = true;
+            for (int j = 0; j < iloscSamochodow; j++) {
+                if (SamochodTab[j]->getId() == samochodId) {
+                    samochodZnaleziony = true;
+                    KlientTab[i].setSamochod(SamochodTab[j]); // ustawienie samochodu dla klienta
+                    cout << "Samochod przypisany do klienta." << endl;
+                    break;
+                }
+            }
+            if (!samochodZnaleziony) {
+                cout << "Nie znaleziono samochodu o podanym id." << endl;
+            }
+            break;
+        }
+    }
+    if (!klientZnaleziony) {
+        cout << "Nie znaleziono klienta o podanym id." << endl;
+    }
+}
+
+void wyswietlKlientowSamochody(Klient* KlientTab, int iloscKlientow) {
+    for (int i = 0; i < iloscKlientow; i++) {
+        cout << "Klient " << KlientTab[i].getId() << ": " << KlientTab[i].getImie() << " " << KlientTab[i].getNazwisko() << endl;
+        if (KlientTab[i].getSamochod() != nullptr) {
+            cout << "\tSamochod " << KlientTab[i].getSamochod()->getId() << ": " << KlientTab[i].getSamochod()->getMarka() << " " << KlientTab[i].getSamochod()->getModel() << endl;
+        }
+    }
+}
 
 
 int main()
@@ -244,6 +283,7 @@ int main()
         cout << "6.Usun Samochod " << endl;
         cout << "7.Posortuj klientow wedlug wieku" << endl;
         cout << "8.Posortuj samochody wzgledem mocy" << endl;
+        cout << "9.Przypisz samochod do klienta" << endl;
         cout << "0.Wyjscie i wyczyszczenie pamieci" << endl;
         cout << "" << endl;
         cout << "Klienci: " << iloscKlientow << "/" << maxIloscKlientow << "" << "  Ilosc samochodow: " << iloscSamochodow << "/" << maxIloscSamochodow << endl;
@@ -254,7 +294,6 @@ int main()
 
         switch (wybor) {
         case 1:
-
             dodajKlienta(klienci, iloscKlientow, maxIloscKlientow);
             cout << "Dodano Klienta" << endl;
             break;
@@ -285,8 +324,14 @@ int main()
         case 8:
             sortujSamochodyWzgledemMocy(samochody, iloscSamochodow);
             break;
+        case 9:
+            przypiszSamochodDoKlienta(klienci, iloscKlientow, samochody, iloscSamochodow);
+            break;
+        case 10:
+            wyswietlKlientowSamochody(klienci, iloscKlientow);
+            break;
         case 0:
-            dzialanie = wyczyscPamiec(klienci, samochody, iloscKlientow, iloscSamochodow);
+            zakonczProgram(klienci, samochody, iloscKlientow, iloscSamochodow);
             break;
         default:
             break;
