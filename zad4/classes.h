@@ -41,7 +41,7 @@ private:
 	string imie;
 	string nazwisko;
 	int wiek;
-	Samochod* samochod; // dodane pole
+	Samochod* samochod; 
 
 public:
 	Klient();
@@ -76,7 +76,7 @@ public:
 
 
 class Wypozyczalnia {
-public:
+private:
 	Samochod** samochody;
 	Klient* klienci;
 	KlientSamochod* klientSamochod;
@@ -88,5 +88,7 @@ public:
 	Wypozyczalnia(const Wypozyczalnia& other);
 	Wypozyczalnia(int maxIloscSamochodow_);
 	~Wypozyczalnia();
+	void ustawSamochody(Samochod** noweSamochody); 
+	
 	friend class KlientSamochod;
 };
