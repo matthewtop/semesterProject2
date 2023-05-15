@@ -83,18 +83,29 @@ public:
 };
 
 class Wypozyczalnia {
-public:
+private:
     Samochod** samochody;
     Klient* klienci;
     int iloscSamochodow;
     int maxIloscSamochodow;
 
 public:
-    Wypozyczalnia() : samochody(nullptr), klienci(nullptr), iloscSamochodow(0), maxIloscSamochodow(0) {}
-    Wypozyczalnia(int maxIloscSamochodow_) : samochody(new Samochod* [maxIloscSamochodow_]), klienci(nullptr), iloscSamochodow(0), maxIloscSamochodow(maxIloscSamochodow_) {}
+    Wypozyczalnia() : samochody(nullptr), klienci(nullptr), iloscSamochodow(0), maxIloscSamochodow(0) {} //domyslny
+    Wypozyczalnia(int maxIloscSamochodow_) : samochody(new Samochod* [maxIloscSamochodow_]), klienci(nullptr), iloscSamochodow(0), maxIloscSamochodow(maxIloscSamochodow_) {} //domyslny z lista inicjalizacyjna
 
-    ~Wypozyczalnia() {
+    ~Wypozyczalnia() { //destruktor
+        for (int i = 0; i < iloscSamochodow; i++) {
+            delete samochody[i];
+        }
         delete[] samochody;
         delete[] klienci;
+    }
+    void ustawSamochody(Samochod** noweSamochody) {
+        for (int i = 0; i < iloscSamochodow; i++) {
+            delete samochody[i];
+        }
+        delete[] samochody;
+
+        samochody = noweSamochody;
     }
 };
