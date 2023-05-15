@@ -2,8 +2,7 @@
 #include <cstdlib>
 #include <string>
 #include "classes.h"
-//#include "classes.cpp"
-//#include "functions.cpp"
+
 #include <random>
 #include <sstream>
 #include <algorithm>
@@ -23,7 +22,7 @@ int main() {
     bool dzialanie = true;
     Wypozyczalnia  wypozyczalnia;
     Samochod** samochody = new Samochod * [maxIloscSamochodow];
-    wypozyczalnia.samochody = samochody;
+    wypozyczalnia.ustawSamochody(samochody);
 
     while (dzialanie) {
         cout << "" << endl;
