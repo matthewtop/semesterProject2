@@ -231,8 +231,7 @@ int main()
     bool dzialanie = true;
     Wypozyczalnia  wypozyczalnia;
     Samochod** samochody = new Samochod * [maxIloscSamochodow];
-    wypozyczalnia.samochody = samochody;
-
+    wypozyczalnia.ustawSamochody(samochody);
     while (dzialanie) {
         cout << "" << endl;
         cout << "Wybierz opcje: " << endl;
