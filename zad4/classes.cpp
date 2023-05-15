@@ -127,6 +127,7 @@ void Klient::setSamochod(Samochod* samochod) {
 // Konstruktor domyślny.
 Wypozyczalnia::Wypozyczalnia() : samochody(nullptr), klienci(nullptr), klientSamochod(nullptr), iloscSamochodow(0), maxIloscSamochodow(0) {}
 
+//konstruktor kopiujacy
 Wypozyczalnia::Wypozyczalnia(const Wypozyczalnia& other) :
     iloscSamochodow(other.iloscSamochodow),
     maxIloscSamochodow(other.maxIloscSamochodow)
@@ -161,14 +162,16 @@ Wypozyczalnia::Wypozyczalnia(const Wypozyczalnia& other) :
         klientSamochod = nullptr;
     }
 }
+void Wypozyczalnia::ustawSamochody(Samochod** noweSamochody) {
+    samochody = noweSamochody;
+}
 
-Wypozyczalnia::Wypozyczalnia(int maxIloscSamochodow_) :
-    samochody(new Samochod* [maxIloscSamochodow_]),
-    klienci(new Klient[maxIloscSamochodow_]),
-    klientSamochod(new KlientSamochod[maxIloscSamochodow_]),
+Wypozyczalnia::Wypozyczalnia(int maxIloscSamochodow_)
+    : samochody(new Samochod* [maxIloscSamochodow_]),
+    klienci(nullptr),
+    klientSamochod(nullptr),
     iloscSamochodow(0),
-    maxIloscSamochodow(maxIloscSamochodow_)
-{}
+    maxIloscSamochodow(maxIloscSamochodow_) {}
 Wypozyczalnia::~Wypozyczalnia() {
     for (int i = 0; i < iloscSamochodow; i++) {
         delete samochody[i];
@@ -177,6 +180,3 @@ Wypozyczalnia::~Wypozyczalnia() {
     delete[] klienci;
     delete[] klientSamochod;
 }
-
-
-
