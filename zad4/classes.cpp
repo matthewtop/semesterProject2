@@ -50,6 +50,7 @@ Samochod::~Samochod() {
     delete silnik;
 }
 
+
 int Samochod::getId() const {
     return id;
 }
@@ -125,7 +126,7 @@ void Klient::setSamochod(Samochod* samochod) {
 // Implementacja klasy Wypozyczalnia
 
 // Konstruktor domyślny.
-Wypozyczalnia::Wypozyczalnia() : samochody(nullptr), klienci(nullptr), klientSamochod(nullptr), iloscSamochodow(0), maxIloscSamochodow(0) {}
+Wypozyczalnia::Wypozyczalnia() : samochody(nullptr), klienci(nullptr),iloscSamochodow(0), maxIloscSamochodow(0) {}
 
 //konstruktor kopiujacy
 Wypozyczalnia::Wypozyczalnia(const Wypozyczalnia& other) :
@@ -151,16 +152,6 @@ Wypozyczalnia::Wypozyczalnia(const Wypozyczalnia& other) :
     else {
         klienci = nullptr;
     }
-
-    if (other.klientSamochod != nullptr) {
-        klientSamochod = new KlientSamochod[maxIloscSamochodow];
-        for (int i = 0; i < maxIloscSamochodow; i++) {
-            klientSamochod[i] = other.klientSamochod[i];
-        }
-    }
-    else {
-        klientSamochod = nullptr;
-    }
 }
 void Wypozyczalnia::ustawSamochody(Samochod** noweSamochody) {
     samochody = noweSamochody;
@@ -169,7 +160,7 @@ void Wypozyczalnia::ustawSamochody(Samochod** noweSamochody) {
 Wypozyczalnia::Wypozyczalnia(int maxIloscSamochodow_)
     : samochody(new Samochod* [maxIloscSamochodow_]),
     klienci(nullptr),
-    klientSamochod(nullptr),
+    //klientSamochod(nullptr),
     iloscSamochodow(0),
     maxIloscSamochodow(maxIloscSamochodow_) {}
 Wypozyczalnia::~Wypozyczalnia() {
@@ -178,5 +169,27 @@ Wypozyczalnia::~Wypozyczalnia() {
     }
     delete[] samochody;
     delete[] klienci;
-    delete[] klientSamochod;
+   // delete[] klientSamochod;
+}
+
+SamochodHelper::SamochodHelper(const Samochod* samochod) : samochod(samochod) {}
+
+int SamochodHelper::getId() const {
+    return samochod->getId();
+}
+
+string SamochodHelper::getMarka() const {
+    return samochod->getMarka();
+}
+
+string SamochodHelper::getModel() const {
+    return samochod->getModel();
+}
+
+int SamochodHelper::getMoc() const {
+    return samochod->getSilnik()->getMoc();
+}
+
+int SamochodHelper::getPojemnosc() const {
+    return samochod->getSilnik()->getPojemnosc();
 }
