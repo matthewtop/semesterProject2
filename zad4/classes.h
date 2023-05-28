@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <iostream>
 using namespace std;
 
 extern int global_int;
@@ -21,16 +22,19 @@ private:
 	string marka;
 	string model;
 	Silnik* silnik;
+	int getId() const;
+	void setId(int newId);
+	string getMarka() const;
+	string getModel() const;
 public:
+
+	friend class SamochodHelper;
 	Samochod();
 	Samochod(int id_, string marka_, string model_, Silnik* silnik_);
 	Samochod(const Samochod& other);
 	Samochod& operator=(const Samochod& other);
 	~Samochod();
-	int getId() const;
-	void setId(int newId);
-	string getMarka() const;
-	string getModel() const;
+	
 	Silnik* getSilnik() const;
 	void setSilnik(Silnik* newSilnik);
 };
@@ -41,7 +45,7 @@ private:
 	string imie;
 	string nazwisko;
 	int wiek;
-	Samochod* samochod; 
+	Samochod* samochod;
 
 public:
 	Klient();
@@ -58,20 +62,6 @@ public:
 	void setSamochod(Samochod* samochod);
 	Samochod* getSamochod() const;
 };
-class KlientSamochod {
-private:
-	Klient* klient;
-	Samochod* samochod;
-public:
-	KlientSamochod() : klient(nullptr), samochod(nullptr) {}
-	KlientSamochod(Klient* klient_, Samochod* samochod_) : klient(klient_), samochod(samochod_) {}
-	Klient* getKlient() const {
-		return klient;
-	}
-	Samochod* getSamochod() const {
-		return samochod;
-	}
-};
 
 
 
@@ -79,7 +69,7 @@ class Wypozyczalnia {
 private:
 	Samochod** samochody;
 	Klient* klienci;
-	KlientSamochod* klientSamochod;
+	//KlientSamochod* klientSamochod;
 	int iloscSamochodow;
 	int maxIloscSamochodow;
 
@@ -88,7 +78,22 @@ public:
 	Wypozyczalnia(const Wypozyczalnia& other);
 	Wypozyczalnia(int maxIloscSamochodow_);
 	~Wypozyczalnia();
-	void ustawSamochody(Samochod** noweSamochody); 
-	
-	friend class KlientSamochod;
+	void ustawSamochody(Samochod** noweSamochody);
+
+	//friend class KlientSamochod;
 };
+
+class SamochodHelper {
+private:
+	const Samochod* samochod;
+public:
+	SamochodHelper(const Samochod* samochod);
+	int getId() const;
+	string getMarka() const;
+	string getModel() const;
+	int getMoc() const;
+	int getPojemnosc() const;
+};
+
+// Funkcje
+void pokazSamochody(Samochod** samochody, int iloscSamochodow); 
