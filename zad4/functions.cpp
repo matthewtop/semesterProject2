@@ -93,9 +93,10 @@ void pokazKlienci(Klient* klientTab, int iloscKlientow) {
 void pokazSamochody(Samochod** samochody, int iloscSamochodow) {
     if (iloscSamochodow != 0) {
         for (int i = 0; i < iloscSamochodow; i++) {
-            cout << samochody[i]->getId() << ". Samochod: " << samochody[i]->getMarka() << " " << samochody[i]->getModel()
-                << "\nMoc: " << samochody[i]->getSilnik()->getMoc() << " KM"
-                << "\nPojemnosc silnika: " << samochody[i]->getSilnik()->getPojemnosc() << " cm^3" << endl << endl;
+            SamochodHelper samochodHelper(samochody[i]);  // Utworzenie obiektu SamochodHelper z samochodem
+            cout << samochodHelper.getId() << ". Samochod: " << samochodHelper.getMarka() << " " << samochodHelper.getModel()
+                << "\nMoc: " << samochodHelper.getMoc() << " KM"
+                << "\nPojemnosc silnika: " << samochodHelper.getPojemnosc() << " cm^3" << endl << endl;
         }
     }
     else {
@@ -127,41 +128,33 @@ void usunKlienta(Klient*& KlientTab, int& iloscKlientow) {
     else
         cout << "Brak klientow" << endl;
 }
+
 void usunSamochod(Samochod**& SamochodTab, int& iloscSamochodow) {
     if (iloscSamochodow != 0) {
-        cout << "Wprowadz numer samochodu do usuniecia:" << endl;
+        std::cout << "Wprowadz numer samochodu do usuniecia:" << std::endl;
         int id;
-        cin >> id;
+        std::cin >> id;
         bool samochodZnaleziony = false;
         for (int i = 0; i < iloscSamochodow; i++) {
-            if (SamochodTab[i]->getId() == id) {
-                Samochod* SamochodTabTemp = new Samochod[iloscSamochodow - 1];
-                for (int j = 0; j < iloscSamochodow - 1; j++) {
-                    if (j >= i) {
-                        SamochodTabTemp[j] = *SamochodTab[j + 1];
-                        SamochodTabTemp[j].setId(SamochodTabTemp[j].getId() - 1);
-                    }
-                    else
-                        SamochodTabTemp[j] = *SamochodTab[j];
-                }
+            SamochodHelper samochodHelper(SamochodTab[i]);  // Utworzenie obiektu SamochodHelper z samochodu
+            if (samochodHelper.getId() == id) {
                 delete SamochodTab[i];
-                delete[] SamochodTab;
-                SamochodTab = new Samochod * [iloscSamochodow - 1];
-                for (int j = 0; j < iloscSamochodow - 1; j++) {
-                    SamochodTab[j] = new Samochod(SamochodTabTemp[j]);
+                for (int j = i; j < iloscSamochodow - 1; j++) {
+                    SamochodTab[j] = SamochodTab[j + 1];
+                   // SamochodTab[j]->SamochodHelper.setId(SamochodTab[j]->getId() - 1);
                 }
-                delete[] SamochodTabTemp;
                 --iloscSamochodow;
                 samochodZnaleziony = true;
                 break;
             }
         }
         if (!samochodZnaleziony)
-            cout << "Nie znaleziono samochodu o podanym numerze ID" << endl;
+            std::cout << "Nie znaleziono samochodu o podanym numerze ID" << std::endl;
     }
     else
-        cout << "Brak samochodow" << endl;
+        std::cout << "Brak samochodow" << std::endl;
 }
+
 
 //usuniecie wszystkich obiektow i wyczyszczenie pamieci
 void zakonczProgram(Klient*& KlientTab, Samochod**& SamochodTab, int iloscKlientow, int iloscSamochodow) {
@@ -204,41 +197,3 @@ void sortujKlientowRosnaco(Klient*& klientTab, int liczbaKlientow) {
     }
 }
 
-
-void przypiszSamochodDoKlienta(Klient* KlientTab, int iloscKlientow, Samochod** SamochodTab, int iloscSamochodow) {
-    int klientId, samochodId;
-    bool klientZnaleziony = false, samochodZnaleziony = false;
-    cout << "Podaj id klienta: ";
-    cin >> klientId;
-    cout << "Podaj id samochodu: ";
-    cin >> samochodId;
-    for (int i = 0; i < iloscKlientow; i++) {
-        if (KlientTab[i].getId() == klientId) {
-            klientZnaleziony = true;
-            for (int j = 0; j < iloscSamochodow; j++) {
-                if (SamochodTab[j]->getId() == samochodId) {
-                    samochodZnaleziony = true;
-                    KlientTab[i].setSamochod(SamochodTab[j]); // ustawienie samochodu dla klienta
-                    cout << "Samochod przypisany do klienta." << endl;
-                    break;
-                }
-            }
-            if (!samochodZnaleziony) {
-                cout << "Nie znaleziono samochodu o podanym id." << endl;
-            }
-            break;
-        }
-    }
-    if (!klientZnaleziony) {
-        cout << "Nie znaleziono klienta o podanym id." << endl;
-    }
-}
-
-void wyswietlKlientowSamochody(Klient* KlientTab, int iloscKlientow) {
-    for (int i = 0; i < iloscKlientow; i++) {
-        cout << "Klient " << KlientTab[i].getId() << ": " << KlientTab[i].getImie() << " " << KlientTab[i].getNazwisko() << endl;
-        if (KlientTab[i].getSamochod() != nullptr) {
-            cout << "\tSamochod " << KlientTab[i].getSamochod()->getId() << ": " << KlientTab[i].getSamochod()->getMarka() << " " << KlientTab[i].getSamochod()->getModel() << endl;
-        }
-    }
-}
