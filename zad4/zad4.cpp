@@ -2,7 +2,6 @@
 #include <cstdlib>
 #include <string>
 #include "classes.h"
-
 #include <random>
 #include <sstream>
 #include <algorithm>
@@ -76,12 +75,6 @@ int main() {
             break;
         case 8:
             sortujSamochodyWzgledemMocy(samochody, iloscSamochodow);
-            break;
-        case 9:
-            przypiszSamochodDoKlienta(klienci, iloscKlientow, samochody, iloscSamochodow);
-            break;
-        case 10:
-            wyswietlKlientowSamochody(klienci, iloscKlientow);
             break;
         case 0:
             zakonczProgram(klienci, samochody, iloscKlientow, iloscSamochodow);
