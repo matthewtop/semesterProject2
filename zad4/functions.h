@@ -13,5 +13,3 @@ void usunSamochod(Samochod**& SamochodTab, int& iloscSamochodow);
 void zakonczProgram(Klient*& KlientTab, Samochod**& SamochodTab, int iloscKlientow, int iloscSamochodow);
 void sortujSamochodyWzgledemMocy(Samochod**& SamochodTab, int& iloscSamochodow);
 void sortujKlientowRosnaco(Klient*& klientTab, int liczbaKlientow);
-void przypiszSamochodDoKlienta(Klient* KlientTab, int iloscKlientow, Samochod** SamochodTab, int iloscSamochodow);
-void wyswietlKlientowSamochody(Klient* KlientTab, int iloscKlientow);
