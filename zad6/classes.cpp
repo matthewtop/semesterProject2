@@ -1,6 +1,8 @@
 #include "classes.h"
-// Implementacja klasy Silnik
 
+
+
+//---------------------S I L N I K --------------------------------//
 Silnik::Silnik() : pojemnosc(0), moc(0) {}
 
 Silnik::Silnik(int pojemnosc_, int moc_) : pojemnosc(pojemnosc_), moc(moc_) {}
@@ -13,8 +15,32 @@ int Silnik::getMoc() const {
     return moc;
 }
 
+bool Silnik::operator==(const Silnik& other) const {
+    return pojemnosc == other.pojemnosc && moc == other.moc;
+}
 
-//Implementacja klasy Najem
+bool Silnik::operator!=(const Silnik& other) const {
+    return !(*this == other);
+}
+
+Silnik& Silnik::operator=(const Silnik& other) {
+    if (this == &other) {
+        return *this;
+    }
+    pojemnosc = other.pojemnosc;
+    moc = other.moc;
+    return *this;
+}
+
+ostream& operator<<(ostream& os, const Silnik& silnik) {
+    os << "Pojemnosc: " << silnik.pojemnosc << endl;
+    os << "Moc: " << silnik.moc << endl;
+    return os;
+}
+//---------------------S I L N I K --------------------------------//
+
+
+//---------------------N A J E M --------------------------------//
 Najem::Najem() : id(0), marka(""), model("") {}
 
 Najem::Najem(int id_, std::string marka_, std::string model_) : id(id_), marka(marka_), model(model_) {}
@@ -23,38 +49,45 @@ Najem::Najem(const Najem& other) : id(other.id), marka(other.marka), model(other
 
 
 int Najem::getId() const {
-    // Implementacja domyœlna, zwraca wartoœæ 0
+    // Implementacja domyÅ›lna, zwraca wartoÅ›Ä‡ 0
     return 0;
 }
 
 string Najem::getMarka() const {
-    // Implementacja domyœlna, zwraca pusty ci¹g znaków
+    // Implementacja domyÅ›lna, zwraca pusty ciÄ…g znakÃ³w
     return "";
 }
 
 string Najem::getModel() const {
-    // Implementacja domyœlna, zwraca pusty ci¹g znaków
+    // Implementacja domyÅ›lna, zwraca pusty ciÄ…g znakÃ³w
     return "";
 }
 
 int Najem::getPojemnosc() const {
-    // Implementacja domyœlna, zwraca wartoœæ 0
+    // Implementacja domyÅ›lna, zwraca wartoÅ›Ä‡ 0
     return 0;
 }
 
 int Najem::getMoc() const {
-    // Implementacja domyœlna, zwraca wartoœæ 0
+    // Implementacja domyÅ›lna, zwraca wartoÅ›Ä‡ 0
     return 0;
 }
 
-// Implementacja klasy Samochod
-Samochod::Samochod() : id(0), marka(""), model(""), silnik(nullptr) {}
+//---------------------N A J E M --------------------------------//
+
+
+
+
+
+
+//---------------------S A M O C H O D --------------------------------//
+Samochod::Samochod() : id(0), marka(""), model(""), silnik(nullptr), czyWynajety(false) {}
 
 Samochod::Samochod(int id_, string marka_, string model_, Silnik* silnik_)
-    : id(id_), marka(marka_), model(model_), silnik(silnik_) {}
+    : id(id_), marka(marka_), model(model_), silnik(silnik_), czyWynajety(false) {}
 
 Samochod::Samochod(const Samochod& other)
-    : id(other.id), marka(other.marka), model(other.model) {
+    : id(other.id), marka(other.marka), model(other.model), czyWynajety(false) {
     if (other.silnik != nullptr) {
         silnik = new Silnik(*other.silnik);
     }
@@ -66,7 +99,6 @@ Samochod::Samochod(const Samochod& other)
 Samochod::~Samochod() {
     delete silnik;
 }
-
 
 int Samochod::getId() const {
     return id;
@@ -98,7 +130,7 @@ int Samochod::getPojemnosc() const {
         return silnik->getPojemnosc();
     }
     else {
-        // Zwróæ wartoœæ domyœln¹ lub obs³u¿ ten przypadek inaczej
+        // ZwrÃ³Ä‡ wartoÅ›Ä‡ domyÅ›lnÄ… lub obsÅ‚uÅ¼ ten przypadek inaczej
         return 0;
     }
 }
@@ -107,8 +139,95 @@ int Samochod::getMoc() const {
     return silnik->getMoc();
 }
 
-// Implementacja klasy Klient
+bool Samochod::getCzyWynajety() const
+{
+    return czyWynajety;
+}
+void Samochod::setCzyWynajety(bool wynajety)
+{
+    czyWynajety = wynajety;
+}
 
+
+bool Samochod::operator==(const Samochod& other) const {
+    return id == other.id && marka == other.marka && model == other.model;
+}
+
+bool Samochod::operator!=(const Samochod& other) const {
+    return !(*this == other);
+}
+
+Samochod& Samochod::operator=(const Samochod& other) {
+    if (this == &other) {
+        return *this;
+    }
+    id = other.id;
+    marka = other.marka;
+    model = other.model;
+    delete silnik;
+    silnik = new Silnik(*other.silnik);
+    return *this;
+}
+
+ostream& operator<<(ostream& os, const Samochod& samochod) {
+    Samochod::SamochodHelper samochodHelper(&samochod); // UtwÃ³rz obiekt SamochodHelper
+
+    os << samochodHelper.getId() << "," << samochodHelper.getMarka() << "," << samochodHelper.getModel()
+        << "," << samochodHelper.getPojemnosc() << "," << samochodHelper.getMoc() << endl;
+    return os;
+}
+//---------------------S A M O C H O D --------------------------------//
+
+
+
+
+
+
+
+//---------------------S A M O C H O D  H E L P E R --------------------------------//
+Samochod::SamochodHelper::SamochodHelper(const Samochod* samochod) {
+    this->samochod = const_cast<Samochod*>(samochod);
+}
+
+string Samochod::SamochodHelper::getMarka() const {
+    return samochod->getMarka();
+}
+
+string Samochod::SamochodHelper::getModel() const {
+    return samochod->getModel();
+}
+
+int Samochod::SamochodHelper::getId() const {
+    return samochod->getId();
+}
+
+int Samochod::SamochodHelper::getMoc() const {
+    return samochod->getMoc();
+}
+
+int Samochod::SamochodHelper::getPojemnosc() const {
+    return samochod->getPojemnosc();
+}
+
+bool Samochod::SamochodHelper::getCzyWynajety() const
+{
+    return samochod->getCzyWynajety();
+}
+
+void Samochod::SamochodHelper::setCzyWynajety(bool wynajety)
+{
+    samochod->czyWynajety = wynajety;
+}
+
+//---------------------S A M O C H O D  H E L P E R --------------------------------//
+
+
+
+
+
+
+
+//---------------------K L I E N T --------------------------------//
 Klient::Klient()
     : samochod(nullptr)
 {
@@ -125,10 +244,11 @@ Klient::Klient(int id_, string imie_, string nazwisko_, int wiek_) {
 }
 
 Klient::~Klient() {
-    if (samochod != nullptr) {
+    if (samochod != nullptr && samochod != Klient::samochod) {
         delete samochod;
     }
 }
+
 int Klient::getId() const {
     return id;
 }
@@ -143,7 +263,7 @@ string Klient::getNazwisko() const {
 
 string Klient::getMarka() const {
     if (samochod != nullptr) {
-        SamochodHelper samochodHelper(samochod);
+        Samochod::SamochodHelper samochodHelper(samochod);
         return samochodHelper.getMarka();
     }
     else {
@@ -153,7 +273,7 @@ string Klient::getMarka() const {
 
 string Klient::getModel() const {
     if (samochod != nullptr) {
-        SamochodHelper samochodHelper(samochod);
+        Samochod::SamochodHelper samochodHelper(samochod);
         return samochodHelper.getModel();
     }
     else {
@@ -163,7 +283,7 @@ string Klient::getModel() const {
 
 int Klient::getPojemnosc() const {
     if (samochod != nullptr) {
-        SamochodHelper samochodHelper(samochod);
+        Samochod::SamochodHelper samochodHelper(samochod);
         return samochodHelper.getPojemnosc();
     }
     else {
@@ -173,7 +293,7 @@ int Klient::getPojemnosc() const {
 
 int Klient::getMoc() const {
     if (samochod != nullptr) {
-        SamochodHelper samochodHelper(samochod);
+        Samochod::SamochodHelper samochodHelper(samochod);
         return samochodHelper.getMoc();
     }
     else {
@@ -216,9 +336,27 @@ void Klient::setDlugoscNajmu(int dlugosc) {
     dlugoscNajmu = dlugosc;
 }
 
-// Implementacja klasy Wypozyczalnia
+Klient::operator Klient* () const {
+    return const_cast<Klient*>(this);
+}
+ostream& operator<<(ostream& os, const Klient& klient) {
+    os << setw(3) << klient.getId() << " | " << setw(15) << klient.getImie() << " | " << setw(20) << klient.getNazwisko() << " | " << setw(4) << klient.getWiek() << endl;
+    return os;
+}
+//---------------------K L I E N T --------------------------------//
 
-// konstruktor domyœlny
+
+
+
+
+
+
+
+
+//---------------------W Y P O Z Y C Z A L N I A --------------------------------//
+
+
+// konstruktor domyÅ›lny
 Wypozyczalnia::Wypozyczalnia() : samochody(nullptr), klienci(nullptr), iloscSamochodow(0), maxIloscSamochodow(0) {}
 
 Wypozyczalnia::Wypozyczalnia(const Wypozyczalnia& other)
@@ -232,9 +370,8 @@ Wypozyczalnia::Wypozyczalnia(const Wypozyczalnia& other)
     else {
         samochody = nullptr;
     }
-
     if (other.klienci != nullptr) {
-        klienci = new Klient[maxIloscSamochodow];
+        klienci = new Klient[iloscSamochodow];
         for (int i = 0; i < iloscSamochodow; i++) {
             klienci[i] = other.klienci[i];
         }
@@ -260,35 +397,7 @@ Wypozyczalnia::~Wypozyczalnia() {
     delete[] klienci;
 }
 
+//---------------------W Y P O Z Y C Z A L N I A --------------------------------//
 
-SamochodHelper::SamochodHelper(const Samochod* samochod) {
-    this->samochod = const_cast<Samochod*>(samochod);
-}
-
-
-int SamochodHelper::getId() const {
-    return samochod->getId();
-}
-
-string SamochodHelper::getMarka() const {
-    return samochod->getMarka();
-}
-
-string SamochodHelper::getModel() const {
-    return samochod->getModel();
-}
-
-int SamochodHelper::getMoc() const {
-    return samochod->getSilnik()->getMoc();
-}
-
-int SamochodHelper::getPojemnosc() const {
-    return samochod->getSilnik()->getPojemnosc();
-}
-/*
-Samochod* SamochodHelper::getSamochod() const
-{
-    return samochod;
-}*/
 
 
