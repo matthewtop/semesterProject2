@@ -19,4 +19,4 @@ void wyswietlSamochody();
 void wyczyscPliki();
 void wynajmijSamochod(vector<Najem*>& biuro);
 void wyswietlNajem(vector<Najem*> biuro);
-
+void printMarkaModel(const Najem* najem); 
