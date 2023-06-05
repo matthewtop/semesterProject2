@@ -25,8 +25,13 @@ int main() {
     Samochod** samochody = new Samochod * [maxIloscSamochodow];
     wypozyczalnia.ustawSamochody(samochody);
     vector<Najem*> biuro;
+    //demonstrowanie polimorfizmu
+    Samochod samochod(1, "Ford", "Mustang", new Silnik(3000, 200));
+    Klient klient(1, "John", "Doe", 30);
     
     while (dzialanie) {
+        printMarkaModel(&samochod);
+        printMarkaModel(&klient);
         cout << "" << endl;
         cout << "Wybierz opcje: " << endl;
         cout << "1.Dodaj Klienta " << endl;
