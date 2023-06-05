@@ -6,6 +6,7 @@
 #include <sstream>
 #include <algorithm>
 #include "functions.h"
+#include <vector>
 
 extern int global_int;
 using namespace std;
@@ -23,8 +24,8 @@ int main() {
     Wypozyczalnia  wypozyczalnia;
     Samochod** samochody = new Samochod * [maxIloscSamochodow];
     wypozyczalnia.ustawSamochody(samochody);
-    //int elementyNaStrone = 10;
-
+    vector<Najem*> biuro;
+    
     while (dzialanie) {
         cout << "" << endl;
         cout << "Wybierz opcje: " << endl;
@@ -51,11 +52,11 @@ int main() {
 
         switch (wybor) {
         case 1:
-            dodajKlienta(klienci, iloscKlientow, maxIloscKlientow);
+            dodajKlienta(klienci, iloscKlientow, maxIloscKlientow, biuro);
             cout << "Dodano Klienta" << endl;
             break;
         case 2:
-            dodajSamochod(samochody, iloscSamochodow, maxIloscSamochodow);
+            dodajSamochod(samochody, iloscSamochodow, maxIloscSamochodow, biuro);
             cout << "Dodano samochod" << endl;
             break;
         case 3:
@@ -91,10 +92,10 @@ int main() {
             wyczyscPliki();
             break;
         case 12:
-            wynajemSamochodu(samochody, klienci, iloscSamochodow, iloscKlientow);
+            wynajmijSamochod(biuro);
             break;
         case 13:
-            wyswietlNajem(klienci, iloscKlientow);
+            wyswietlNajem(biuro);
             break;
         case 0:
             zakonczProgram(klienci, samochody, iloscKlientow, iloscSamochodow);
