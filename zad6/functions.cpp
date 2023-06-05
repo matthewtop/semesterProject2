@@ -6,65 +6,72 @@
 #include <algorithm>
 #include <fstream> 
 #include <iomanip>
+#include <vector>
 
 
-void dodajKlienta(Klient*& KlientTab, int& iloscKlientow, int maxIloscKlientow) {
+
+void dodajKlienta(Klient*& KlientTab, int& iloscKlientow, int maxIloscKlientow, vector<Najem*>& biuro) {
     if (iloscKlientow < maxIloscKlientow) {
         Klient* KlientTabTemp = new Klient[iloscKlientow + 1];
-        int i = 0;
-        if (iloscKlientow > 0) {
-            for (i; i < iloscKlientow; i++)
-            {
-                KlientTabTemp[i] = KlientTab[i];
+        if (KlientTabTemp != nullptr) {
+            int i = 0;
+            if (iloscKlientow > 0) {
+                for (i = 0; i < iloscKlientow; i++) {
+                    KlientTabTemp[i] = KlientTab[i];
+                }
+                delete[] KlientTab;
             }
-            delete[] KlientTab;
-        }
-        cin.ignore();
-        string daneKlienta;
-        cout << "Podaj imie, nazwisko i wiek klienta oddzielajac je srednikiem (;): ";
-        getline(cin, daneKlienta);
-        size_t pos = daneKlienta.find(";");
-        if (pos != string::npos) {
-            Klient klient;
-            klient.setImie(daneKlienta.substr(0, pos));
-            size_t prev_pos = pos + 1;
-            pos = daneKlienta.find(";", prev_pos);
+            cin.ignore();
+            string daneKlienta;
+            cout << "Podaj imie, nazwisko i wiek klienta oddzielajac je srednikiem (;): ";
+            getline(cin, daneKlienta);
+            size_t pos = daneKlienta.find(";");
             if (pos != string::npos) {
-                klient.setNazwisko(daneKlienta.substr(prev_pos, pos - prev_pos));
-                prev_pos = pos + 1;
-                string wiekStr = daneKlienta.substr(prev_pos);
-                if (!wiekStr.empty() && wiekStr.find_first_not_of("0123456789") == string::npos) {
-                    int wiek = stoi(wiekStr);
-                    klient.setWiek(wiek);
-                    klient.setId(iloscKlientow + 1);
-                    KlientTabTemp[iloscKlientow] = klient;
-                    KlientTab = KlientTabTemp;
-                    iloscKlientow++;
+                Klient& klient = KlientTabTemp[i];
+                klient.setImie(daneKlienta.substr(0, pos));
+                size_t prev_pos = pos + 1;
+                pos = daneKlienta.find(";", prev_pos);
+                if (pos != string::npos) {
+                    klient.setNazwisko(daneKlienta.substr(prev_pos, pos - prev_pos));
+                    prev_pos = pos + 1;
+                    string wiekStr = daneKlienta.substr(prev_pos);
+                    if (!wiekStr.empty() && wiekStr.find_first_not_of("0123456789") == string::npos) {
+                        int wiek = stoi(wiekStr);
+                        klient.setWiek(wiek);
+                        klient.setId(iloscKlientow + 1);
+                        KlientTabTemp[iloscKlientow] = klient;
+                        KlientTab = KlientTabTemp;
+                        biuro.push_back(&KlientTabTemp[iloscKlientow]); // Dodawanie wskaźnika na klienta do wektora biuro
+                        iloscKlientow++;
 
-                    // zapis danych klienta do pliku
-                    ofstream plik("klienci.txt", ios::app); // Otw�rz plik w trybie do��czania danych (append)
+                        // zapis danych klienta do pliku
+                        ofstream plik("klienci.txt", ios::app); // Otwórz plik w trybie dołączania danych (append)
 
-                    if (plik.is_open()) {
-                        // Zapisz dane klienta w odpowiednim formacie do pliku
-                        plik << setw(3) << klient.getId() << " | " << setw(15) << klient.getImie() << " | " << setw(20) << klient.getNazwisko() << " | " << setw(4) << klient.getWiek() << endl;
-
-                        plik.close(); // Zamknij plik
+                        if (plik.is_open()) {
+                            // Zapisz dane klienta w odpowiednim formacie do pliku
+                            // używając przeciążonego operatora
+                            plik << klient;
+                            plik.close();
+                        }
+                        else {
+                            cout << "Blad otwarcia pliku." << endl;
+                        }
+                        return;
                     }
-                    else {
-                        cout << "Blad otwarcia pliku." << endl;
-                    }
-                    return;
                 }
             }
+            cout << "Nieprawidlowe dane. Klient nie zostal dodany." << endl;
+            delete[] KlientTabTemp;
         }
-        cout << "Nieprawidlowe dane. Klient nie zostal dodany." << endl;
-        delete[] KlientTabTemp;
+        else {
+            cout << "Blad alokacji pamieci." << endl;
+        }
     }
     else {
-        cout << "Nie mozna dodac wiccej klientow!" << endl;
+        cout << "Nie mozna dodac wiecej klientow!" << endl;
     }
 }
-void dodajSamochod(Samochod**& SamochodTab, int& iloscSamochodow, int maxIloscSamochodow) {
+void dodajSamochod(Samochod**& SamochodTab, int& iloscSamochodow, int maxIloscSamochodow, vector<Najem*>& biuro) {
     if (iloscSamochodow < maxIloscSamochodow) {
         Samochod** SamochodTabTemp = new Samochod * [iloscSamochodow + 1];
         int i = 0;
@@ -101,15 +108,14 @@ void dodajSamochod(Samochod**& SamochodTab, int& iloscSamochodow, int maxIloscSa
         SamochodTab = SamochodTabTemp;
         iloscSamochodow++;
 
+        // Dodaj samochód do wektora biuro
+        biuro.push_back(static_cast<Najem*>(samochod));
+
         // Zapisz dane samochodu do pliku
         ofstream plik("samochody.txt", ios::app);
 
         if (plik.is_open()) {
-            SamochodHelper samochodHelper(samochod); // Utw�rz obiekt SamochodHelper
-
-            plik << samochodHelper.getId() << "," << samochodHelper.getMarka() << "," << samochodHelper.getModel()
-                << "," << samochodHelper.getPojemnosc() << "," << samochodHelper.getMoc() << endl;
-
+            plik << *samochod;
             plik.close();
         }
         else {
@@ -120,7 +126,6 @@ void dodajSamochod(Samochod**& SamochodTab, int& iloscSamochodow, int maxIloscSa
         cout << "Nie mozna dodac wiecej samochodow." << endl;
     }
 }
-
 
 
 void pokazKlienci(Klient* KlientTab, int iloscKlientow) {
@@ -145,7 +150,7 @@ void pokazSamochody(Samochod** SamochodTab, int iloscSamochodow) {
     int maxModelWidth = 15;
 
     for (int i = 0; i < iloscSamochodow; i++) {
-        SamochodHelper helper(SamochodTab[i]);
+        Samochod::SamochodHelper helper(SamochodTab[i]);
 
         maxModelWidth = max(maxModelWidth, static_cast<int>(helper.getModel().length()));
 
@@ -186,12 +191,11 @@ void usunSamochod(Samochod**& SamochodTab, int& iloscSamochodow) {
         std::cin >> id;
         bool samochodZnaleziony = false;
         for (int i = 0; i < iloscSamochodow; i++) {
-            SamochodHelper samochodHelper(SamochodTab[i]);  // Utworzenie obiektu SamochodHelper z samochodu
+            Samochod::SamochodHelper samochodHelper(SamochodTab[i]);  // Utworzenie obiektu SamochodHelper z samochodu
             if (samochodHelper.getId() == id) {
                 delete SamochodTab[i];
                 for (int j = i; j < iloscSamochodow - 1; j++) {
                     SamochodTab[j] = SamochodTab[j + 1];
-                    // SamochodTab[j]->SamochodHelper.setId(SamochodTab[j]->getId() - 1);
                 }
                 --iloscSamochodow;
                 samochodZnaleziony = true;
@@ -226,8 +230,8 @@ void zakonczProgram(Klient*& KlientTab, Samochod**& SamochodTab, int iloscKlient
 void sortujSamochodyWzgledemMocy(Samochod**& SamochodTab, int& iloscSamochodow) {
     for (int i = 0; i < iloscSamochodow - 1; i++) {
         for (int j = 0; j < iloscSamochodow - i - 1; j++) {
-            SamochodHelper samochodHelper1(SamochodTab[j]); // Utw�rz obiekt SamochodHelper dla pierwszego samochodu
-            SamochodHelper samochodHelper2(SamochodTab[j + 1]); // Utw�rz obiekt SamochodHelper dla drugiego samochodu
+            Samochod::SamochodHelper samochodHelper1(SamochodTab[j]); // Utwórz obiekt SamochodHelper dla pierwszego samochodu
+            Samochod::SamochodHelper samochodHelper2(SamochodTab[j + 1]); // Utwórz obiekt SamochodHelper dla drugiego samochodu
 
             if (samochodHelper1.getMoc() > samochodHelper2.getMoc()) {
                 Samochod* temp = SamochodTab[j];
@@ -236,7 +240,7 @@ void sortujSamochodyWzgledemMocy(Samochod**& SamochodTab, int& iloscSamochodow) 
             }
         }
     }
-    // Wy�wietlenie posortowanej tablicy
+    // Wyświetlenie posortowanej tablicy
     pokazSamochody(SamochodTab, iloscSamochodow);
 }
 
@@ -285,84 +289,81 @@ void wyczyscPliki() {
     ofstream plikSamochody("samochody.txt", ofstream::trunc);
     if (plikSamochody.is_open()) {
         plikSamochody.close();
-        cout << "Plik samochody.txt zosta� wyczyszczony." << endl;
+        cout << "Plik samochody.txt został wyczyszczony." << endl;
     }
     else {
         cout << "Nie mozna otworzyc pliku samochody.txt." << endl;
     }
 }
+int Wypozyczalnia::liczbaWypozyczonychSamochodow = 0;
 
-void wynajemSamochodu(Samochod** SamochodTab, Klient* KlientTab, int iloscSamochodow, int iloscKlientow) {
-    if (iloscSamochodow == 0 || iloscKlientow == 0) {
-        cout << "Brak samochodow lub klientow do wynajecia." << endl;
-        return;
-    }
+void wynajmijSamochod(vector<Najem*>& biuro) {
+    int idKlienta, idSamochodu;
+    int dlugoscNajmu;
 
-    int idKlienta;
-    int idSamochodu;
-    int dlugoscWynajmu;
-
-    cout << "Podaj ID klienta: ";
+    // Wprowadzanie identyfikatora klienta
+    cout << "Podaj identyfikator klienta: ";
     cin >> idKlienta;
 
-    cout << "Podaj ID samochodu: ";
+    // Wprowadzanie identyfikatora samochodu
+    cout << "Podaj identyfikator samochodu: ";
     cin >> idSamochodu;
 
-    cout << "Podaj dlugosc wynajmu w miesiacach: ";
-    cin >> dlugoscWynajmu;
+    // Wprowadzanie długości wynajmu
+    cout << "Podaj długość wynajmu (w dniach): ";
+    cin >> dlugoscNajmu;
 
-    Samochod* samochod = nullptr;
+    // Wyszukaj klienta na podstawie podanego identyfikatora
     Klient* klient = nullptr;
-
-    // Find the selected samochod and klient based on their IDs
-    for (int i = 0; i < iloscSamochodow; i++) {
-
-        if (SamochodTab[i]->getId() == idSamochodu) {
-            samochod = SamochodTab[i];
-            break;
+    for (Najem* najem : biuro) {
+        if (Klient* klientPtr = dynamic_cast<Klient*>(najem)) {
+            if (klientPtr->getId() == idKlienta) {
+                klient = klientPtr;
+                break;
+            }
         }
     }
 
-    for (int i = 0; i < iloscKlientow; i++) {
-        if (KlientTab[i].getId() == idKlienta) {
-            klient = &KlientTab[i];
-            break;
+    // Wyszukaj samochód na podstawie podanego identyfikatora
+    Samochod* samochod = nullptr;
+    for (Najem* najem : biuro) {
+        if (Samochod* samochodPtr = dynamic_cast<Samochod*>(najem)) {
+            if (samochodPtr->getId() == idSamochodu) {
+                samochod = samochodPtr;
+                break;
+            }
         }
     }
 
-    if (samochod != nullptr && klient != nullptr) {
-        if (klient->getSamochod() == nullptr) {
-            SamochodHelper samochodHelper(samochod);
-            klient->setSamochod(samochod);
-            klient->setDlugoscNajmu(dlugoscWynajmu);
-            cout << "Samochod o ID " << samochodHelper.getId() << " zostal wynajety klientowi o ID " << klient->getId() << " na okres " << dlugoscWynajmu << " miesiecy." << endl;
-        }
-        else {
-            cout << "Klient o ID " << klient->getId() << " ma juz wynajety samochod." << endl;
-        }
+    // Sprawdź, czy znaleziono klienta i samochód
+    if (klient && samochod) {
+        // Przypisz samochód klientowi
+        klient->setSamochod(samochod);
+        // Oznacz samochód jako wynajęty za pomocą SamochodHelper
+        Samochod::SamochodHelper samochodHelper(samochod);
+        samochodHelper.setCzyWynajety(true);
+        // Ustaw długość wynajmu dla klienta
+        klient->setDlugoscNajmu(dlugoscNajmu);
+        // Inkrementuj liczbę wypożyczonych samochodów w klasie Wypozyczalnia
+        Wypozyczalnia::liczbaWypozyczonychSamochodow++;
+        cout << "Samochod o ID " << idSamochodu << " zostal wynajety przez klienta o ID " << idKlienta << endl;
     }
     else {
-        cout << "Nie znaleziono samochodu lub klienta o podanym ID." << endl;
+        cout << "Nie znaleziono klienta o ID " << idKlienta << " lub samochodu o ID " << idSamochodu << endl;
     }
 }
-void wyswietlNajem(Klient* KlientTab, int iloscKlientow) {
+void wyswietlNajem(vector<Najem*> biuro) {
     cout << "+-----------------+----------------------+-----------------+-----------------+---------------+" << endl;
     cout << "| Imie            | Nazwisko             | Marka           | Model           | Dlugosc najmu |" << endl;
     cout << "+-----------------+----------------------+-----------------+-----------------+---------------+" << endl;
 
-    for (int i = 0; i < iloscKlientow; i++) {
-        Klient klient = KlientTab[i];
-
-        Samochod* wynajetySamochod = klient.getSamochod();
-        if (wynajetySamochod != nullptr) {
-            SamochodHelper samochodHelper(wynajetySamochod); // Utw�rz obiekt SamochodHelper
-            cout << "| " << setw(15) << klient.getImie() << " | " << setw(20) << klient.getNazwisko() << " | ";
+    for (auto najem : biuro) {
+        Klient* klient = dynamic_cast<Klient*>(najem);
+        if (klient != nullptr && klient->getSamochod() != nullptr && klient->getSamochod()->getCzyWynajety()) {
+            Samochod::SamochodHelper samochodHelper(klient->getSamochod());
+            cout << "| " << setw(15) << klient->getImie() << " | " << setw(20) << klient->getNazwisko() << " | ";
             cout << setw(15) << samochodHelper.getMarka() << " | " << setw(15) << samochodHelper.getModel() << " | ";
-            cout << left << setw(5) << klient.getDlugoscNajmu() << "miesiac";
-            if (klient.getDlugoscNajmu() > 1) {
-                cout << "e";
-            }
-            cout << " |" << endl;
+            cout << setw(13) << klient->getDlugoscNajmu() << " |" << endl;
         }
     }
 
