@@ -369,3 +369,8 @@ void wyswietlNajem(vector<Najem*> biuro) {
 
     cout << "+-----------------+----------------------+-----------------+-----------------+---------------+" << endl;
 }
+void printMarkaModel(const Najem* najem) {
+    cout << "Marka: " << najem->getMarka() << endl;
+    cout << "Model: " << najem->getModel() << endl;
+    cout << "Imie: " << najem->getImie() << endl;
+}
