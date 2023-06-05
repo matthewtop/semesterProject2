@@ -73,6 +73,11 @@ int Najem::getMoc() const {
     return 0;
 }
 
+string Najem::getImie() const
+{
+    return string();
+}
+
 //---------------------N A J E M --------------------------------//
 
 
@@ -331,6 +336,7 @@ void Klient::setSamochod(Samochod* samochod) {
     delete this->samochod;
     this->samochod = samochod;
 }
+
 
 void Klient::setDlugoscNajmu(int dlugosc) {
     dlugoscNajmu = dlugosc;
